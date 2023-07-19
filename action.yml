@@ -1,0 +1,32 @@
+name: 'Install SSH Config Action'
+description: 'Install SSH Config'
+author: wxul
+inputs:
+  name:
+    description: id_rsa config file name
+    required: true
+
+  ssh_key:
+    description: private ssh key put in id_rsa_example
+    required: true
+
+  known_hosts:
+    description: known_hosts
+    required: false
+
+  if_exist:
+    description: If config file exist, ignore or fail
+    required: false
+    default: ignore
+
+  config:
+    description: ssh config
+    required: true
+
+outputs:
+  error_message:
+    description: The error message, if an error occurs
+
+runs:
+  using: 'node16'
+  main: 'lib/index.js'

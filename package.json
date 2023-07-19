@@ -1,0 +1,22 @@
+{
+  "name": "install-ssh-action",
+  "version": "1.0.0",
+  "description": "",
+  "main": "lib/index.js",
+  "scripts": {
+    "build": "ncc build ./src/index.ts -o ./lib -t"
+  },
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "node": "18"
+  },
+  "volta": {
+    "node": "18.16.0"
+  },
+  "dependencies": {
+    "@actions/core": "^1.10.0",
+    "@types/node": "^20.4.2",
+    "typescript": "^5.1.6"
+  }
+}
