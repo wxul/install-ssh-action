@@ -1,5 +1,5 @@
 import * as core from "@actions/core";
-import { existsSync, mkdirSync, statSync, writeFileSync } from "fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { resolve } from "path";
 
 const BASE_SSH_PATH = resolve(process.env["HOME"], ".ssh");
@@ -13,7 +13,7 @@ async function run() {
 
   if (!existsSync(BASE_SSH_PATH)) {
     mkdirSync(BASE_SSH_PATH, {
-      mode: 0o755,
+      mode: 0o700,
       recursive: true,
     });
   }
@@ -22,27 +22,43 @@ async function run() {
   if (existsSync(sshKeyFilePath)) {
     if (if_exist === "ignore") {
       return;
+    } else if (if_exist === "override") {
+      writeFileSync(sshKeyFilePath, ssh_key + "\n", {
+        mode: 0o600,
+        flag: "w",
+      });
     } else {
       throw new Error("Config file exist!");
     }
+  } else {
+    writeFileSync(sshKeyFilePath, ssh_key + "\n", {
+      mode: 0o600,
+      flag: "w",
+    });
   }
 
-  writeFileSync(sshKeyFilePath, ssh_key, {
-    mode: 0o600,
-  });
-
   const sshConfigFilePath = resolve(BASE_SSH_PATH, "config");
-  writeFileSync(sshConfigFilePath, "\n" + config + "\n", {
-    mode: 0o644,
-    flag: "a",
-  });
-
-  if (known_hosts) {
-    const knownHostFilePath = resolve(BASE_SSH_PATH, "known_hosts");
-    writeFileSync(knownHostFilePath, "\n" + known_hosts + "\n", {
+  const sshConfig = existsSync(sshConfigFilePath)
+    ? readFileSync(sshConfigFilePath).toString()
+    : "";
+  if (!sshConfig.includes(config)) {
+    writeFileSync(sshConfigFilePath, "\n" + config + "\n", {
       mode: 0o644,
       flag: "a",
     });
+  }
+
+  if (known_hosts) {
+    const knownHostFilePath = resolve(BASE_SSH_PATH, "known_hosts");
+    const knownHost = existsSync(knownHostFilePath)
+      ? readFileSync(knownHostFilePath).toString()
+      : "";
+    if (knownHost.includes(known_hosts)) {
+      writeFileSync(knownHostFilePath, "\n" + known_hosts + "\n", {
+        mode: 0o644,
+        flag: "a",
+      });
+    }
   }
 
   core.info("SSH key has installed");
