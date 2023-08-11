@@ -57,7 +57,7 @@ async function run() {
     if (knownHost.includes(known_hosts)) {
       writeFileSync(knownHostFilePath, "\n" + known_hosts + "\n", {
         mode: 0o644,
-        flag: "a",
+        flag: clean ? "w" : "a",
       });
     }
   }
