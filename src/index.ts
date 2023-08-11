@@ -9,6 +9,7 @@ async function run() {
   const ssh_key = core.getInput("ssh_key", { required: true });
   const known_hosts = core.getInput("known_hosts");
   const if_exist = core.getInput("if_exist") || "ignore";
+  const clean = !!core.getInput("clean");
   const config = core.getInput("config", { required: true });
 
   if (!existsSync(BASE_SSH_PATH)) {
@@ -44,7 +45,7 @@ async function run() {
   if (!sshConfig.includes(config)) {
     writeFileSync(sshConfigFilePath, "\n" + config + "\n", {
       mode: 0o644,
-      flag: "a",
+      flag: clean ? "w" : "a",
     });
   }
 
