@@ -19,10 +19,10 @@ inputs:
     required: false
     default: ignore
 
-  clean:
+  do_not_clean:
     description: clean ~/.ssh/config
     required: false
-    default: 'true'
+    default: 'false'
 
   config:
     description: ssh config
