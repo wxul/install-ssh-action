@@ -22,7 +22,7 @@ inputs:
   clean:
     description: clean ~/.ssh/config
     required: false
-    default: false
+    default: 'true'
 
   config:
     description: ssh config
@@ -35,3 +35,4 @@ outputs:
 runs:
   using: 'node16'
   main: 'lib/index.js'
+  post: 'lib/index.js'

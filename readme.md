@@ -20,7 +20,7 @@ with:
   name: 'id_rsa_example' ## id_rsa file name
   ssh_key: ${{ secrets.PRIVATE_SSH_KEY }} ## private ssh key put in id_rsa_example
   known_hosts: ${{ secrets.KNOWN_HOSTS }} ## known_hosts
-  if_exist: 'ignore' ## ignore | fail
+  if_exist: 'ignore' ## ignore | fail | override
   config: |
     Host example
       HostName xx.xx.xx.xx
