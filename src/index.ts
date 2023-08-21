@@ -6,6 +6,7 @@ const BASE_SSH_PATH = resolve(process.env["HOME"], ".ssh");
 
 function writeSSHKey(name: string, key: string, if_exist: string) {
   const sshKeyFilePath = resolve(BASE_SSH_PATH, name);
+  core.saveState("sshKeyFilePath", sshKeyFilePath);
   if (existsSync(sshKeyFilePath) && if_exist !== "override") {
     if (if_exist === "ignore") {
       return;
@@ -18,7 +19,6 @@ function writeSSHKey(name: string, key: string, if_exist: string) {
       flag: "w",
     });
   }
-  core.saveState("sshKeyFilePath", sshKeyFilePath);
 }
 
 function writeSSHConfig(name: string, config: string, if_exist: string) {
@@ -80,8 +80,6 @@ async function cleanup() {
   const cleanup = core.getState("cleanup") === "true";
   if (!cleanup) return;
   const sshKeyFilePath = core.getState("sshKeyFilePath");
-  core.info("ssh:" + sshKeyFilePath + `, ${existsSync(sshKeyFilePath)}`);
-  core.info(core.getInput("name"));
   if (existsSync(sshKeyFilePath)) {
     rmSync(sshKeyFilePath);
     core.info(`Remove ssh_key file: ${sshKeyFilePath}`);
@@ -93,7 +91,8 @@ async function cleanup() {
   if (existsSync(sshConfigFilePath)) {
     const content = readFileSync(sshConfigFilePath)
       .toString()
-      .replaceAll(includeConfig, "");
+      .replaceAll(includeConfig, "")
+      .replace(/\n{2,}/g, "\n");
     writeFileSync(sshConfigFilePath, content, { mode: 0o644, flag: "w" });
     core.info(`Remove include in config: ${includeConfig}`);
     rmSync(tempSSHConfigPath);
@@ -105,7 +104,8 @@ async function cleanup() {
   if (existsSync(known_hosts) && known_hosts) {
     const content = readFileSync(knownHostFilePath)
       .toString()
-      .replaceAll(known_hosts, "");
+      .replaceAll(known_hosts, "")
+      .replace(/\n{2,}/g, "\n");
     writeFileSync(knownHostFilePath, content, { mode: 0o644, flag: "w" });
     core.info(`Remove known_hosts`);
   }
