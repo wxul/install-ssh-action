@@ -47,6 +47,8 @@ async function install() {
   const if_exist = core.getInput("if_exist") || "ignore";
   const clean = core.getInput("clean") === "true";
   const config = core.getInput("config", { required: true });
+  core.info(`name: ${name}`);
+  core.info(`clean: ${clean}, ${typeof clean}`);
 
   core.saveState("cleanup", clean);
 
