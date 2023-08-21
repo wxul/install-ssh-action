@@ -47,8 +47,6 @@ async function install() {
   const if_exist = core.getInput("if_exist") || "ignore";
   const clean = core.getInput("do_not_clean") !== "true";
   const config = core.getInput("config", { required: true });
-  core.info(`name: ${name}`);
-  core.info(`clean: ${clean}, ${typeof clean}, ${core.getInput("do_not_clean")}`);
 
   core.saveState("cleanup", clean);
 
@@ -84,6 +82,7 @@ async function cleanup() {
   const sshKeyFilePath = core.getState("sshKeyFilePath");
   if (existsSync(sshKeyFilePath)) {
     rmSync(sshKeyFilePath);
+    core.info(`Remove ssh_key file: ${sshKeyFilePath}`);
   }
 
   const sshConfigFilePath = core.getState("sshConfigFilePath");
@@ -92,9 +91,11 @@ async function cleanup() {
   if (existsSync(sshConfigFilePath)) {
     const content = readFileSync(sshConfigFilePath)
       .toString()
-      .replace(includeConfig, "");
+      .replaceAll(includeConfig, "");
     writeFileSync(sshConfigFilePath, content, { mode: 0o644, flag: "w" });
+    core.info(`Remove include in config: ${includeConfig}`);
     rmSync(tempSSHConfigPath);
+    core.info(`Remove temp config file: ${tempSSHConfigPath}`);
   }
 
   const known_hosts = core.getState("known_hosts");
@@ -102,8 +103,9 @@ async function cleanup() {
   if (existsSync(known_hosts) && known_hosts) {
     const content = readFileSync(knownHostFilePath)
       .toString()
-      .replace(known_hosts, "");
+      .replaceAll(known_hosts, "");
     writeFileSync(knownHostFilePath, content, { mode: 0o644, flag: "w" });
+    core.info(`Remove known_hosts`);
   }
 }
 
