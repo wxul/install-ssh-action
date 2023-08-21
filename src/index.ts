@@ -80,6 +80,8 @@ async function cleanup() {
   const cleanup = core.getState("cleanup") === "true";
   if (!cleanup) return;
   const sshKeyFilePath = core.getState("sshKeyFilePath");
+  core.info("ssh:" + sshKeyFilePath + `, ${existsSync(sshKeyFilePath)}`);
+  core.info(core.getInput("name"));
   if (existsSync(sshKeyFilePath)) {
     rmSync(sshKeyFilePath);
     core.info(`Remove ssh_key file: ${sshKeyFilePath}`);
