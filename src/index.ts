@@ -35,9 +35,10 @@ function writeSSHConfig(name: string, config: string, if_exist: string) {
 
   core.info("Update ssh config");
   const includeConfig = `Include ${name}.config`;
-  writeFileSync(sshConfigFilePath, "\n" + includeConfig + "\n", {
+  const configStr = readFileSync(sshConfigFilePath).toString();
+  writeFileSync(sshConfigFilePath, includeConfig + "\n" + configStr, {
     mode: 0o644,
-    flag: "a",
+    flag: "w",
   });
   core.saveState("sshConfigFilePath", sshConfigFilePath);
   core.saveState("tempSSHConfigPath", tempSSHConfigPath);
