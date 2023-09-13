@@ -9,11 +9,13 @@ function writeSSHKey(name: string, key: string, if_exist: string) {
   core.saveState("sshKeyFilePath", sshKeyFilePath);
   if (existsSync(sshKeyFilePath) && if_exist !== "override") {
     if (if_exist === "ignore") {
+      core.info("SSH exist, ignore");
       return;
     } else if (if_exist === "fail") {
       throw new Error("Config file exist!");
     }
   } else {
+    core.info("SSH key not fount or need override");
     writeFileSync(sshKeyFilePath, key + "\n", {
       mode: 0o600,
       flag: "w",
@@ -25,11 +27,13 @@ function writeSSHConfig(name: string, config: string, if_exist: string) {
   const sshConfigFilePath = resolve(BASE_SSH_PATH, "config");
   const tempSSHConfigPath = resolve(BASE_SSH_PATH, `${name}.config`);
 
+  core.info("Add ssh config file");
   writeFileSync(tempSSHConfigPath, config + "\n", {
     mode: 0o644,
     flag: "w",
   });
 
+  core.info("Update ssh config");
   const includeConfig = `Include ${name}.config`;
   writeFileSync(sshConfigFilePath, "\n" + includeConfig + "\n", {
     mode: 0o644,
@@ -41,6 +45,7 @@ function writeSSHConfig(name: string, config: string, if_exist: string) {
 }
 
 async function install() {
+  core.info("Begin install");
   const name = core.getInput("name", { required: true });
   const ssh_key = core.getInput("ssh_key", { required: true });
   const known_hosts = core.getInput("known_hosts");
@@ -51,6 +56,7 @@ async function install() {
   core.saveState("cleanup", clean);
 
   if (!existsSync(BASE_SSH_PATH)) {
+    core.info("SSH dir not fount, create");
     mkdirSync(BASE_SSH_PATH, {
       mode: 0o700,
       recursive: true,
@@ -60,6 +66,7 @@ async function install() {
   writeSSHKey(name, ssh_key, if_exist);
   writeSSHConfig(name, config, if_exist);
 
+  core.info("Update known_hosts");
   const knownHostFilePath = resolve(BASE_SSH_PATH, "known_hosts");
   const knownHost = existsSync(knownHostFilePath)
     ? readFileSync(knownHostFilePath).toString()
@@ -77,6 +84,7 @@ async function install() {
 }
 
 async function cleanup() {
+  core.info("Begin clean");
   const cleanup = core.getState("cleanup") === "true";
   if (!cleanup) return;
   const sshKeyFilePath = core.getState("sshKeyFilePath");
