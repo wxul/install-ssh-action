@@ -16,7 +16,7 @@ function writeSSHKey(name: string, key: string, if_exist: string) {
     }
   } else {
     core.info("SSH key not fount or need override");
-    writeFileSync(sshKeyFilePath, key + "\n", {
+    writeFileSync(sshKeyFilePath, key + "\n\n", {
       mode: 0o600,
       flag: "w",
     });
@@ -28,7 +28,7 @@ function writeSSHConfig(name: string, config: string, if_exist: string) {
   const tempSSHConfigPath = resolve(BASE_SSH_PATH, `${name}.config`);
 
   core.info("Add ssh config file");
-  writeFileSync(tempSSHConfigPath, config + "\n", {
+  writeFileSync(tempSSHConfigPath, config + "\n\n", {
     mode: 0o644,
     flag: "w",
   });
@@ -36,7 +36,7 @@ function writeSSHConfig(name: string, config: string, if_exist: string) {
   core.info("Update ssh config");
   const includeConfig = `Include ${name}.config`;
   const configStr = readFileSync(sshConfigFilePath).toString();
-  writeFileSync(sshConfigFilePath, includeConfig + "\n" + configStr, {
+  writeFileSync(sshConfigFilePath, includeConfig + "\n\n" + configStr, {
     mode: 0o644,
     flag: "w",
   });
@@ -73,7 +73,7 @@ async function install() {
     ? readFileSync(knownHostFilePath).toString()
     : "";
   if (known_hosts && !knownHost.includes(known_hosts)) {
-    writeFileSync(knownHostFilePath, "\n" + known_hosts + "\n", {
+    writeFileSync(knownHostFilePath, "\n\n" + known_hosts + "\n\n", {
       mode: 0o644,
       flag: "a",
     });
@@ -101,7 +101,7 @@ async function cleanup() {
     const content = readFileSync(sshConfigFilePath)
       .toString()
       .replaceAll(includeConfig, "")
-      .replace(/\n{2,}/g, "\n");
+      .replace(/\n{2,}/g, "\n\n");
     writeFileSync(sshConfigFilePath, content, { mode: 0o644, flag: "w" });
     core.info(`Remove include in config: ${includeConfig}`);
     rmSync(tempSSHConfigPath);
@@ -114,7 +114,7 @@ async function cleanup() {
     const content = readFileSync(knownHostFilePath)
       .toString()
       .replaceAll(known_hosts, "")
-      .replace(/\n{2,}/g, "\n");
+      .replace(/\n{2,}/g, "\n\n");
     writeFileSync(knownHostFilePath, content, { mode: 0o644, flag: "w" });
     core.info(`Remove known_hosts`);
   }
